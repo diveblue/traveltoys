@@ -54,6 +54,15 @@ const points=[
 {name:"Old Pasadena",lat:34.1459,lon:-118.1501,days:["Saturday 8/29"],color:"#8b5cf6"},
 {name:"Universal Studios Hollywood",lat:34.1381,lon:-118.3534,days:["Sunday 8/30"],color:"#e66100"},
 {name:"GRAMMY Museum",lat:34.0447,lon:-118.2646,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Palace Theatre",lat:34.0457858,lon:-118.2525542,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Monte Carlo Cafe",lat:34.046572,lon:-118.2481327,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Stranger in Moscow street",lat:34.0481238,lon:-118.2472244,days:["Monday 8/31"],color:"#0086c9"},
+{name:"1038 Venice Blvd.",lat:34.0411308,lon:-118.2788365,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Michael Jackson Off The Wall Album cover location",lat:34.076481,lon:-118.3592183,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Michael Jackson star",lat:34.1016711,lon:-118.3411133,days:["Monday 8/31"],color:"#0086c9"},
+{name:"TCL Chinese Theatre - MJ Handprints",lat:34.1020231,lon:-118.3409712,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Thriller Dance Break",lat:34.0166423,lon:-118.1959693,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Fisherman's Village / Marina del Rey",lat:33.9766,lon:-118.4572,days:["Monday 8/31"],color:"#0086c9"},
 {name:"The Basement Escape Room",lat:34.3057,lon:-118.4178,days:["Monday 8/31"],color:"#0086c9"},
 {name:"Horror Escapes LA",lat:34.0409,lon:-118.2618,days:["Monday 8/31"],color:"#0086c9"},
 {name:"West Hollywood",lat:34.0900,lon:-118.3617,days:["Monday 8/31"],color:"#0086c9"},
@@ -66,6 +75,7 @@ const points=[
 {name:"Carmine's - Forum Shops",lat:36.1175,lon:-115.1757,days:["Wednesday 9/2"],color:"#8a5cf6"},
 {name:"High Roller",lat:36.1176,lon:-115.1685,days:["Wednesday 9/2"],color:"#8a5cf6"},
 {name:"Shark Reef Aquarium",lat:36.0908,lon:-115.1750,days:["Thursday 9/3"],color:"#00a5a8"},
+{name:"Border Grill Mandalay Bay",lat:36.0910,lon:-115.1752,days:["Thursday 9/3"],color:"#00a5a8"},
 {name:"Michael Jackson ONE",lat:36.0905,lon:-115.1757,days:["Thursday 9/3"],color:"#00a5a8"},
 {name:"Princess Diana Exhibition",lat:36.1082,lon:-115.1769,days:["Friday 9/4"],color:"#d04f9b"},
 {name:"Sphere",lat:36.1206,lon:-115.1614,days:["Friday 9/4"],color:"#d04f9b"},
@@ -88,16 +98,19 @@ schedule:[
 sidebar:{Reservations:"Budget rental car pickup at LAX.",Transport:"Rental car day. Keep extra airport/rental-car buffer.",Comfort:"Minimal walking if parked close to the Observatory.",Notes:"Santa Monica Pier dinner remains a flexible add-on for an open evening if desired."}
 },
 "Friday 8/28":{
-theme:"Getty + Fran",color:"#26a269",pace:"Easy–Moderate",
+theme:"Getty + Fran + Dinner with Mark",color:"#26a269",pace:"Easy–Moderate",
 stops:["Embassy Suites Glendale","Aspens Place Recording","Getty Center","Fran's House","Embassy Suites Glendale"],
 schedule:[
 ["7:30–8:30 AM","Breakfast at hotel.","All four"],
 ["9:30 AM","Leave Glendale; drop Rina at Aspen according to the existing conference/recording plan.","Split"],
 ["11:30 AM–3:00 PM","Getty Center: tram, galleries, gardens and lunch.","Scott / Michelle / Marsha"],
 ["3:30–5:45 PM","Visit Fran.","Scott / Michelle / Marsha"],
-["Around 7:00 PM","Pick up Rina; dinner near Burbank/Glendale.","All four"]
+["Around 7:00 PM","Pick up Rina when her day finishes, then drive back toward the hotel/dinner area. Allow for Friday evening traffic.","All four"],
+["7:45–8:00 PM target","Dinner with Mark. Restaurant/location is TBD — choose it based on the pickup route and ease of getting back to Glendale.","All four + Mark"],
+["By 10:15 PM","Leave dinner with enough buffer for Friday traffic.","All four"],
+["Before 11:00 PM","Hard deadline: back at Embassy Suites Glendale.","All four"]
 ],
-sidebar:{Reservations:"Getty timed entry / parking if required.",Transport:"Rental car.",Comfort:"Getty tram and indoor galleries make this one of the easier days.",Notes:"Keep exact Aspen times from the existing reservation schedule."}
+sidebar:{Reservations:"Dinner with Mark: location TBD. Getty timed entry / parking if required.",Transport:"Rental car. Do not commit to a dinner neighborhood until the pickup route is known; minimize backtracking after Rina is picked up.",Comfort:"Getty tram and indoor galleries make the daytime manageable. Friday dinner should be convenient, not another cross-LA excursion.",Notes:"Hard constraint: return to the hotel before 11:00 PM."}
 },
 "Saturday 8/29":{
 theme:"Michael's Birthday + Forest Lawn",color:"#8b5cf6",pace:"Easy",
@@ -124,17 +137,21 @@ schedule:[
 sidebar:{Reservations:"Universal tickets in advance.",Transport:"Rental car.",Comfort:"Studio Tour is tram-based; the park itself involves more walking.",Notes:"Do not overpack this day."}
 },
 "Monday 8/31":{
-theme:"GRAMMY Museum + Horror Escape + Mark",color:"#0086c9",pace:"Moderate",
-stops:["Embassy Suites Glendale","GRAMMY Museum","The Basement Escape Room","Horror Escapes LA","West Hollywood","Embassy Suites Glendale"],
+theme:"GRAMMY Museum + Full Michael Jackson Hollywood Route",color:"#0086c9",pace:"Full / flexible",
+stops:["Embassy Suites Glendale","GRAMMY Museum","Palace Theatre","Monte Carlo Cafe","Stranger in Moscow street","1038 Venice Blvd.","Thriller Dance Break","Michael Jackson Off The Wall Album cover location","Michael Jackson star","TCL Chinese Theatre - MJ Handprints","The Basement Escape Room","Horror Escapes LA","Embassy Suites Glendale"],
 schedule:[
-["10:15 AM","Leave Glendale for downtown LA.","All four / as desired"],
-["11:00 AM–2:00 PM","GRAMMY Museum. Monday is the correct museum day; Tuesday is closed.","Group"],
-["2:00–3:00 PM","Lunch near L.A. LIVE.","Group"],
-["3:30–4:30 PM","Preferred horror option: THE BASEMENT in Sylmar, if an afternoon game slot is available.","Scott + Rina / interested guests"],
-["Backup","Horror Escapes LA, 1041 S Olive St, is the close-to-GRAMMY backup if its booking calendar has a workable slot.","Scott + Rina / interested guests"],
-["6:30–7:00 PM","Dinner with Mark in/near West Hollywood. Final restaurant and time TBD.","Group / family"]
+["9:30 AM","DRIVE — Leave Embassy Suites Glendale for L.A. LIVE. Use the rental car for the long hops today.","All four / interested group"],
+["10:30–11:00 AM","PARK ONCE — Park at an L.A. LIVE garage and get settled before the museum opens.","Group"],
+["11:00 AM–1:00 PM","GRAMMY Museum. Monday is the correct museum day; Tuesday is closed.","Group"],
+["1:00–1:30 PM","Lunch/snack near L.A. LIVE, then retrieve the rental car.","Group"],
+["1:30–2:45 PM","DRIVE + QUICK STOPS — Downtown/Westlake Michael cluster: Palace Theatre, Monte Carlo Cafe, Stranger in Moscow street and 1038 Venice Blvd. These are short photo stops; use the car between them instead of hunting for long-stay parking.","Rina + interested group"],
+["2:45–3:10 PM","OPTIONAL QUICK STOP — Thriller Dance Break location. Keep this only if traffic is moving well; it is geographically less convenient than the core Hollywood cluster.","Rina + interested group"],
+["3:10–3:35 PM","DRIVE — Head toward Hollywood, including the Off The Wall album-cover location en route if traffic/curb access is workable.","Rina + interested group"],
+["3:35–5:15 PM","PARK ONCE — Park at Ovation Hollywood / Hollywood & Highland area. From one garage, visit Michael Jackson's Hollywood Walk of Fame star and the TCL Chinese Theatre MJ handprints. Keep walking compact; do not move the rental car between these stops.","Rina + interested group"],
+["After 5:15 PM","OPTIONAL HORROR — THE BASEMENT is the preferred escape-room choice if a bookable time fits comfortably. Horror Escapes LA remains the backup. Do not cut core MJ stops to force either one in.","Scott + Rina / interested guests"],
+["Flex only","Fisherman's Village / Marina del Rey remains preserved from the original itinerary as an optional add-on, but it is lower priority than the GRAMMY Museum, the core MJ locations and a sane end-of-day schedule.","Group"]
 ],
-sidebar:{Reservations:"Book the horror room only after confirming a time that protects dinner with Mark.",Transport:"Rental car. The Basement is the better experience but the less convenient drive; Horror Escapes LA is the downtown fallback.",Comfort:"Museum is indoors; horror room adds standing/movement.",Notes:"THE BASEMENT is favored. Do not use Horror Escapes LA unless its actual Monday booking calendar shows availability."}
+sidebar:{Reservations:"GRAMMY Museum is the anchor. Horror room only after a workable game time is confirmed.",Transport:"HYBRID PLAN: rental car between geographic clusters; park once at L.A. LIVE; use quick curb/photo stops downtown where legal; park once again at Ovation Hollywood for the MJ Star + TCL Chinese Theatre. Use rideshare only if parking conditions make a specific short stop impractical.",Comfort:"Avoid turning 'park once' into a long Hollywood walk. Keep the Hollywood cluster compact and use the car again for anything beyond it.",Notes:"Protected Michael stops: Palace Theatre, Monte Carlo Cafe, Stranger in Moscow, 1038 Venice, Thriller Dance Break, Off The Wall location, MJ Star and TCL Chinese Theatre handprints. The Basement is optional and loses if the day becomes too tight."}
 },
 "Tuesday 9/1":{
 theme:"Neverland + Santa Barbara Coast Day",color:"#d1242f",pace:"Long drive / scenic",
@@ -165,19 +182,19 @@ schedule:[
 sidebar:{Reservations:"UA1809; Venetian; High Roller tickets. Reserve Carmine's dinner.",Transport:"Favor rideshare/taxi between resorts to minimize Marsha's walking. Adjacent-looking Strip hotels can still involve long indoor walks.",Comfort:"Build seated breaks at Bellagio and dinner before High Roller.",Notes:"Carmine's is at Caesars, not Bellagio."}
 },
 "Thursday 9/3":{
-theme:"Mandalay Bay Day + Michael Jackson ONE",color:"#00a5a8",pace:"Easy",
-stops:["The Venetian Resort","Shark Reef Aquarium","Michael Jackson ONE","The Venetian Resort"],
+theme:"Mandalay Bay Day + Border Grill + Michael Jackson ONE",color:"#00a5a8",pace:"Easy",
+stops:["The Venetian Resort","Shark Reef Aquarium","Border Grill Mandalay Bay","Michael Jackson ONE","The Venetian Resort"],
 schedule:[
 ["Late morning","Slow start / breakfast at The Venetian.","All four"],
 ["1:30 PM","Rideshare/taxi to Mandalay Bay.","All four"],
-["2:00–4:30 PM","Shark Reef Aquarium. Official daily hours are 10 AM–8 PM; last admission 7 PM.","All four"],
-["4:30–6:00 PM","Rest, browse Mandalay Bay and leave plenty of time for the Michael Jackson ONE shop.","All four"],
-["6:15 PM","Dinner at Mandalay Bay so there is no cross-Strip travel before the show.","All four"],
-["7:45–8:30 PM","Shop / theater area / settle in.","All four"],
+["2:00–4:30 PM","Shark Reef Aquarium. Keep this comfortably paced for the whole group.","All four"],
+["4:30–6:30 PM","Stay at Mandalay Bay: rest, browse, and deliberately allow time for the Michael Jackson ONE store before dinner.","All four"],
+["7:00 PM","Border Grill at Mandalay Bay — confirmed dinner reservation.","All four • booked"],
+["8:15 PM","Finish dinner and head toward the MJ ONE theater. Use this time for a bathroom stop / settling in rather than depending on post-dinner shopping.","All four"],
 ["9:00–10:30 PM","Michael Jackson ONE by Cirque du Soleil.","All four • booked"],
 ["After show","Rideshare/taxi back to The Venetian.","All four"]
 ],
-sidebar:{Reservations:"Michael Jackson ONE at 9:00 PM for all four. Aquarium locked into the plan.",Transport:"One rideshare each way; keep the whole afternoon/evening at Mandalay Bay.",Comfort:"Excellent low-transfer day.",Notes:"Official MJ ONE schedule currently lists 9 PM Thursday performances; show runs about 90 minutes."}
+sidebar:{Reservations:"7:00 PM Border Grill at Mandalay Bay; 9:00 PM Michael Jackson ONE for all four. Shark Reef locked into the plan.",Transport:"One rideshare each way; keep the whole afternoon/evening at Mandalay Bay.",Comfort:"Excellent low-transfer day. Build seated/rest time before dinner.",Notes:"MJ ONE shopping is intentionally scheduled before the 7:00 PM dinner reservation so it is not squeezed by the 9:00 PM show."}
 },
 "Friday 9/4":{
 theme:"Split Day: Diana + Sphere / Omega Mart + Horror Unleashed",color:"#d04f9b",pace:"Moderate",
@@ -212,13 +229,13 @@ sidebar:{Reservations:"Nacho Daddy reservation optional but useful for the group
 
 const summaries={
 "Thursday 8/27":"LAX, Budget rental, Glendale, Griffith",
-"Friday 8/28":"Getty, Fran, Aspen plan",
+"Friday 8/28":"Getty, Fran, Rina pickup, dinner with Mark",
 "Saturday 8/29":"Forest Lawn on Michael's birthday",
 "Sunday 8/30":"Universal Studio Tour",
-"Monday 8/31":"GRAMMY, horror escape, dinner with Mark",
+"Monday 8/31":"GRAMMY + full Michael Hollywood route + optional horror",
 "Tuesday 9/1":"Neverland + Santa Barbara coast day",
 "Wednesday 9/2":"UA1809 to Vegas, Bellagio, Carmine's, High Roller",
-"Thursday 9/3":"Shark Reef + MJ ONE",
+"Thursday 9/3":"Shark Reef + Border Grill 7 PM + MJ ONE",
 "Friday 9/4":"Diana/Sphere + Omega Mart/Horror Unleashed",
 "Saturday 9/5":"Fremont Street + Nacho Daddy"
 };
@@ -228,7 +245,7 @@ const routeLinks={
 "Friday 8/28":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Getty+Center+Los+Angeles|Santa+Monica+CA",
 "Saturday 8/29":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Forest+Lawn+Glendale|Old+Pasadena",
 "Sunday 8/30":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Universal+Studios+Hollywood",
-"Monday 8/31":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=West+Hollywood+CA&travelmode=driving&waypoints=GRAMMY+Museum+Los+Angeles|The+Basement+Escape+Room+Sylmar",
+"Monday 8/31":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=West+Hollywood+CA&travelmode=driving&waypoints=GRAMMY+Museum+Los+Angeles|Palace+Theatre+Los+Angeles|Michael+Jackson+Star+Hollywood|TCL+Chinese+Theatre",
 "Tuesday 9/1":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Neverland+Valley+Ranch+Los+Olivos|Stearns+Wharf+Santa+Barbara",
 "Wednesday 9/2":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=High+Roller+Las+Vegas&travelmode=driving&waypoints=Bellagio+Conservatory|Carmine%27s+Las+Vegas",
 "Thursday 9/3":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=The+Venetian+Resort+Las+Vegas&travelmode=driving&waypoints=Shark+Reef+Aquarium+Mandalay+Bay",
@@ -287,16 +304,16 @@ function overviewHtml(){
  <p>The trip now runs from Los Angeles into Las Vegas. The dates below are the corrected anchors.</p>
  <div class="overview-grid">${dayOrder.map(d=>`<div class="card overview-day" onclick="selectDay('${d}')"><b>${d} — ${esc(days[d].theme)}</b><span>${esc(summaries[d])} • Pace: ${esc(days[d].pace)}</span></div>`).join('')}</div>
  <div class="card rules"><b>Locked corrections & priorities</b><ul>
- <li><b>Mon Aug 31:</b> GRAMMY Museum + dinner with Mark; horror escape optional, with <b>The Basement favored</b>.</li>
+ <li><b>Fri Aug 28:</b> Dinner with Mark after Rina pickup, target 7:45–8:00 PM; location TBD; <b>back at the hotel before 11 PM</b>.</li><li><b>Mon Aug 31:</b> GRAMMY Museum + the <b>full original Michael Hollywood route</b>. Horror escape remains optional, with <b>The Basement favored</b>.</li>
  <li><b>Tue Sep 1:</b> Neverland gates + Santa Barbara coastal day.</li>
  <li><b>Wed Sep 2:</b> United UA1809 LAX 11:05 AM → LAS 12:20 PM; Venetian; Bellagio; Carmine's; High Roller.</li>
- <li><b>Thu Sep 3:</b> Shark Reef Aquarium + Michael Jackson ONE at 9 PM.</li>
+ <li><b>Thu Sep 3:</b> Shark Reef Aquarium + <b>Border Grill reservation at 7 PM</b> + Michael Jackson ONE at 9 PM.</li>
  <li><b>Fri Sep 4:</b> Michelle/Marsha — Diana + 2 PM Sphere. Scott/Rina — optional Omega Mart + Universal Horror Unleashed.</li>
  <li><b>Sat Sep 5:</b> Fremont Street + Nacho Daddy.</li>
  <li>Vegas transportation should favor rideshare/taxi and clustered activities to minimize Marsha's walking.</li>
  <li>Zak Bagans Haunted Museum is removed.</li>
  </ul></div>
- <div class="card"><b>Still flexible</b><p>Santa Monica Pier dinner remains an optional LA evening. Final dinner time/place with Mark and exact horror-escape game time still need booking.</p></div>`;
+ <div class="card"><b>Merge audit</b><p>The pre-upload GitHub commit was used as the baseline. The original Michael locations are preserved and now appear explicitly in Monday’s schedule, with parking/transport strategy shown.</p></div><div class="card"><b>Still flexible</b><p>Santa Monica Pier dinner remains an optional LA evening. Final dinner time/place with Mark and exact horror-escape game time still need booking.</p></div>`;
 }
 function sourcesHtml(day){
  const items=sourceNotes[day]||[]; if(!items.length) return '';
@@ -306,10 +323,20 @@ function dayHtml(day){
  const d=days[day];
  const events=d.schedule.map(e=>`<div class="event"><div class="time">${esc(e[0])}</div><div>${esc(e[1])}</div>${e[2]?`<div class="who">${esc(e[2])}</div>`:''}</div>`).join('');
  const sidebar=Object.entries(d.sidebar).map(([k,v])=>`<div class="info"><div class="label">${esc(k)}</div><div>${esc(v)}</div></div>`).join('');
+ let protectedStops='';
+ if(day==='Monday 8/31'){
+   protectedStops=`<div class="card"><b>Restored from the original itinerary — do not drop these</b>
+   <div class="split"><div><div class="label">Downtown / Westlake MJ cluster</div><ul>
+   <li>Palace Theatre</li><li>Monte Carlo Cafe</li><li>Stranger in Moscow street</li><li>1038 Venice Blvd.</li><li>Thriller Dance Break (optional outlier)</li>
+   </ul></div><div><div class="label">Hollywood MJ cluster</div><ul>
+   <li>Off The Wall album-cover location</li><li>Michael Jackson Star</li><li>TCL Chinese Theatre — MJ handprints</li>
+   </ul></div></div>
+   <p class="small">Fisherman's Village / Marina del Rey is also preserved as a flex stop. If the day is too full, remove the optional horror room or marina before removing the core Michael locations.</p></div>`;
+ }
  return `<div class="day-head"><span class="dot" style="background:${d.color}"></span><h2>${day} — ${esc(d.theme)}</h2><span class="badge">Pace: ${esc(d.pace)}</span></div>
  <div class="timeline">${events}</div>
  <a class="btn" target="_blank" rel="noopener" href="${routeLinks[day]}">Open rough route in Google Maps</a>
- <div class="sidegrid">${sidebar}</div>${sourcesHtml(day)}`;
+ <div class="sidegrid">${sidebar}</div>${protectedStops}${sourcesHtml(day)}`;
 }
 function selectDay(day){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.day===day));document.getElementById('content').innerHTML=day==='all'?overviewHtml():dayHtml(day);draw(day);}
 function initMap(){if(!window.L){document.getElementById('map').innerHTML='<div style="padding:20px">Map library did not load. Route buttons still open Google Maps.</div>';return;}map=L.map('map').setView([35,-117],7);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);}
