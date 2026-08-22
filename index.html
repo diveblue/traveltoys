@@ -38,7 +38,7 @@ h1{font-size:clamp(20px,2.5vw,34px);margin:0;line-height:1.05}.subtitle{font-siz
 </head>
 <body><div class="app">
 <header class="top"><div class="top-row"><div><h1>Rina's 21st Birthday Trip</h1><div class="subtitle">Los Angeles + Las Vegas • Aug 27–Sep 5, 2026 • MJ, Neverland, Santa Barbara, Sphere, horror & more</div></div><nav class="tabs" id="tabs"></nav></div></header>
-<main class="main"><section class="panel"><div class="content" id="content"></div></section><section class="mapwrap"><div id="map"></div><p class="mapnote">Tap markers for Google Maps. Dashed lines show the selected day's rough route. Vegas transport favors rideshare/taxi to reduce walking.</p></section></main>
+<main class="main"><section class="panel"><div class="content" id="content"></div></section><section class="mapwrap"><div id="map"></div><p class="mapnote">On a selected day, numbered pins show stop order. Overview pins stay unnumbered. Tap markers for Google Maps; dashed lines show the day’s rough route.</p></section></main>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -290,13 +290,37 @@ function initTabs(){
  makeBtn('Overview','all','#17324b');
  dayOrder.forEach(d=>makeBtn(d.replace(/\s\d+\/\d+$/,''),d,days[d].color));
 }
-function markerIcon(color){return L.divIcon({className:'',html:`<div style="background:${color};width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 2px 7px #333"></div>`,iconSize:[18,18],iconAnchor:[9,9]});}
+function markerIcon(color,label=null){
+ const txt=label===null?'':String(label);
+ const size=label===null?18:26;
+ const font=label===null?0:12;
+ return L.divIcon({
+   className:'',
+   html:`<div style="background:${color};width:${size}px;height:${size}px;border-radius:50%;border:3px solid white;box-shadow:0 2px 7px #333;color:white;font-weight:900;font-size:${font}px;display:flex;align-items:center;justify-content:center;line-height:1">${txt}</div>`,
+   iconSize:[size,size],
+   iconAnchor:[size/2,size/2]
+ });
+}
 function draw(day){
  if(!map) return;
  markers.forEach(m=>map.removeLayer(m)); lines.forEach(l=>map.removeLayer(l)); markers=[]; lines=[];
- let bounds=[]; const show=day==='all'?points:points.filter(p=>p.days.includes(day));
- show.forEach(p=>{const color=day==='all'?p.color:days[day].color;const m=L.marker([p.lat,p.lon],{icon:markerIcon(color)}).addTo(map).bindPopup(`<b>${esc(p.name)}</b><br>${p.days.map(esc).join('<br>')||'Reference'}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}">Open in Google Maps</a>`);markers.push(m);bounds.push([p.lat,p.lon]);});
- if(day!=='all'){const pts=days[day].stops.map(n=>pointByName[n]).filter(Boolean).map(p=>[p.lat,p.lon]);if(pts.length>1){lines.push(L.polyline(pts,{color:days[day].color,weight:4,opacity:.75,dashArray:'7,8'}).addTo(map));bounds=pts;}}
+ let bounds=[];
+ if(day==='all'){
+   points.forEach(p=>{
+     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p.color)}).addTo(map)
+       .bindPopup(`<b>${esc(p.name)}</b><br>${p.days.map(esc).join('<br>')||'Reference'}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}">Open in Google Maps</a>`);
+     markers.push(m); bounds.push([p.lat,p.lon]);
+   });
+ } else {
+   const orderedStops=days[day].stops.map(n=>pointByName[n]).filter(Boolean);
+   orderedStops.forEach((p,i)=>{
+     const m=L.marker([p.lat,p.lon],{icon:markerIcon(days[day].color,i+1)}).addTo(map)
+       .bindPopup(`<b>${i+1}. ${esc(p.name)}</b><br>${esc(day)}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}">Open in Google Maps</a>`);
+     markers.push(m); bounds.push([p.lat,p.lon]);
+   });
+   const pts=orderedStops.map(p=>[p.lat,p.lon]);
+   if(pts.length>1) lines.push(L.polyline(pts,{color:days[day].color,weight:4,opacity:.75,dashArray:'7,8'}).addTo(map));
+ }
  if(bounds.length) map.fitBounds(bounds,{padding:[35,35]}); setTimeout(()=>map.invalidateSize(),80);
 }
 function overviewHtml(){
