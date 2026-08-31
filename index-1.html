@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rina's 21st Birthday Trip</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#f8f5f0;--paper:#fffaf2;--ink:#171717;--muted:#5f6470;--line:#e1d7c8;--gold:#c9912b;--blue:#17324b;--booked:#e8f6ee;--optional:#fff3d6}
+*{box-sizing:border-box} html,body{height:100%;margin:0} body{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.4;overflow:hidden}
+.app{height:100dvh;display:flex;flex-direction:column}
+.top{flex:0 0 auto;background:linear-gradient(135deg,#171717,#47321a 60%,#8a6428);color:white;padding:12px 18px 10px;box-shadow:0 2px 12px rgba(0,0,0,.18);z-index:10}
+.top-row{display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:clamp(20px,2.5vw,34px);margin:0;line-height:1.05}.subtitle{font-size:13px;color:#f7e6c7;margin-top:3px}
+.tabs{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 0 2px;scrollbar-width:thin}
+.tabs button{border:0;color:white;border-radius:999px;padding:9px 14px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:none;flex:0 0 auto}
+.tabs button.active{outline:3px solid rgba(255,255,255,.65);box-shadow:0 3px 10px rgba(0,0,0,.25);transform:translateY(-1px)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(390px,44%) minmax(420px,56%);gap:0}
+.panel{min-height:0;overflow:hidden;border-right:1px solid var(--line);background:linear-gradient(180deg,#fffaf2,#fff7ec)}
+.content{height:100%;overflow:auto;padding:18px 20px 24px}
+.mapwrap{min-height:0;padding:18px;background:#fffdf8;display:flex;flex-direction:column;gap:10px}
+#map{flex:1;min-height:0;border-radius:18px;border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.mapnote{font-size:12px;color:var(--muted);margin:0}
+.day-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.dot{width:18px;height:18px;border-radius:50%;box-shadow:0 0 0 5px rgba(0,0,0,.08)} h2{font-size:clamp(22px,3vw,30px);margin:0}
+.badge{background:#eef0f4;border-radius:999px;padding:4px 10px;font-size:13px;color:#1d2733}.badge.booked{background:var(--booked)}.badge.optional{background:var(--optional)}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.timeline{border-left:3px solid #e0d3bd;margin-left:8px;padding-left:17px}.event{margin:14px 0}.time{font-weight:900;color:#6a4612;margin-bottom:2px}.who{font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
+.sidegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.info{border-left:4px solid var(--gold);padding:10px 12px;background:#fff;border-radius:12px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900;margin-bottom:4px}
+.btn{display:inline-block;background:#174d7a;color:white;text-decoration:none;border-radius:999px;padding:10px 14px;font-weight:800;margin:10px 8px 0 0}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.overview-day{cursor:pointer}.overview-day b{display:block}.overview-day span{font-size:13px;color:var(--muted)}
+.rules{font-size:14px} ul{margin:8px 0 0 22px;padding:0} li{margin:5px 0}.small{font-size:12px;color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.split .card{margin:4px 0}
+@media(max-width:900px){body{overflow:auto}.app{height:auto;min-height:100dvh}.top{position:sticky;top:0}.main{display:flex;flex-direction:column}.mapwrap{order:1;height:45dvh;min-height:330px;padding:12px}.panel{order:2;border-right:0}.content{height:auto;overflow:visible;padding:14px}.sidegrid,.split,.overview-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.top{padding:10px 12px}.tabs button{padding:8px 11px;font-size:13px}.mapwrap{height:42dvh;min-height:300px}.content{font-size:15px}}
+@media print{body{overflow:visible;background:white}.app{height:auto}.top{position:relative}.main{display:block}.mapwrap{height:420px}.panel,.content{overflow:visible}}
+</style>
+</head>
+<body><div class="app">
+<header class="top"><div class="top-row"><div><h1>Rina's 21st Birthday Trip</h1><div class="subtitle">Los Angeles + Las Vegas • Aug 27–Sep 5, 2026 • MJ, Neverland, Santa Barbara, Sphere, horror & more</div></div><nav class="tabs" id="tabs"></nav></div></header>
+<main class="main"><section class="panel"><div class="content" id="content"></div></section><section class="mapwrap"><div id="map"></div><p class="mapnote">On a selected day, numbered pins show stop order. Overview pins stay unnumbered. Tap markers for Google Maps; dashed lines show the day’s rough route.</p></section></main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const points=[
+{name:"LAX",lat:33.9422,lon:-118.4036,days:["Thursday 8/27","Wednesday 9/2"],color:"#2f6bff"},
+{name:"Budget Rental Car - LAX",lat:33.9536,lon:-118.3852,days:["Thursday 8/27","Wednesday 9/2"],color:"#2f6bff"},
+{name:"Embassy Suites Glendale",lat:34.1575,lon:-118.2574,days:["Thursday 8/27","Friday 8/28","Saturday 8/29","Sunday 8/30","Monday 8/31","Tuesday 9/1","Wednesday 9/2"],color:"#2f6bff"},
+{name:"Griffith Observatory",lat:34.1184,lon:-118.3004,days:["Thursday 8/27"],color:"#2f6bff"},
+{name:"Aspens Place Recording",lat:34.2892,lon:-118.4469,days:["Friday 8/28","Saturday 8/29","Sunday 8/30"],color:"#26a269"},
+{name:"Getty Center",lat:34.0780,lon:-118.4741,days:["Friday 8/28"],color:"#26a269"},
+{name:"Fran's House",lat:34.0453,lon:-118.5128,days:["Friday 8/28"],color:"#26a269"},
+{name:"Forest Lawn",lat:34.1246,lon:-118.2514,days:["Saturday 8/29"],color:"#8b5cf6"},
+{name:"Old Pasadena",lat:34.1459,lon:-118.1501,days:["Saturday 8/29"],color:"#8b5cf6"},
+{name:"Universal Studios Hollywood",lat:34.1381,lon:-118.3534,days:["Sunday 8/30"],color:"#e66100"},
+{name:"GRAMMY Museum",lat:34.0447,lon:-118.2646,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Palace Theatre",lat:34.0457858,lon:-118.2525542,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Monte Carlo Cafe",lat:34.046572,lon:-118.2481327,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Stranger in Moscow street",lat:34.0481238,lon:-118.2472244,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Thriller House — 1345 Carroll Ave",lat:34.069687,lon:-118.254499,days:["Monday 8/31"],color:"#0086c9"},
+{name:"1038 Venice Blvd. — The Graff Lab / Michael Jackson murals",lat:34.0411308,lon:-118.2788365,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Michael Jackson Off The Wall Album cover location",lat:34.076481,lon:-118.3592183,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Michael Jackson star",lat:34.1016711,lon:-118.3411133,days:["Monday 8/31"],color:"#0086c9"},
+{name:"TCL Chinese Theatre - MJ Handprints",lat:34.1020231,lon:-118.3409712,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Thriller Dance Break",lat:34.0166423,lon:-118.1959693,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Fisherman's Village / Marina del Rey",lat:33.9766,lon:-118.4572,days:["Monday 8/31"],color:"#0086c9"},
+{name:"The Basement Escape Room",lat:34.3057,lon:-118.4178,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Horror Escapes LA",lat:34.0409,lon:-118.2618,days:["Monday 8/31"],color:"#0086c9"},
+{name:"West Hollywood",lat:34.0900,lon:-118.3617,days:["Monday 8/31"],color:"#0086c9"},
+{name:"Neverland Valley Ranch Gates",lat:34.7347,lon:-120.0882,days:["Tuesday 9/1"],color:"#d1242f"},
+{name:"Santa Barbara",lat:34.4208,lon:-119.6982,days:["Tuesday 9/1"],color:"#d1242f"},
+{name:"Stearns Wharf",lat:34.4100,lon:-119.6857,days:["Tuesday 9/1"],color:"#d1242f"},
+{name:"Harry Reid International Airport",lat:36.0840,lon:-115.1537,days:["Wednesday 9/2"],color:"#8a5cf6"},
+{name:"The Venetian Resort",lat:36.1212,lon:-115.1697,days:["Wednesday 9/2","Thursday 9/3","Friday 9/4","Saturday 9/5"],color:"#8a5cf6"},
+{name:"Bellagio Conservatory",lat:36.1126,lon:-115.1767,days:["Wednesday 9/2"],color:"#8a5cf6"},
+{name:"Carmine's - Forum Shops",lat:36.1175,lon:-115.1757,days:["Wednesday 9/2"],color:"#8a5cf6"},
+{name:"High Roller",lat:36.1176,lon:-115.1685,days:["Wednesday 9/2"],color:"#8a5cf6"},
+{name:"Shark Reef Aquarium",lat:36.0908,lon:-115.1750,days:["Thursday 9/3"],color:"#00a5a8"},
+{name:"Border Grill Mandalay Bay",lat:36.0910,lon:-115.1752,days:["Thursday 9/3"],color:"#00a5a8"},
+{name:"Michael Jackson ONE",lat:36.0905,lon:-115.1757,days:["Thursday 9/3"],color:"#00a5a8"},
+{name:"Princess Diana Exhibition",lat:36.1082,lon:-115.1769,days:["Friday 9/4"],color:"#d04f9b"},
+{name:"Sphere",lat:36.1206,lon:-115.1614,days:["Friday 9/4"],color:"#d04f9b"},
+{name:"Omega Mart / AREA15",lat:36.1330,lon:-115.1807,days:["Friday 9/4"],color:"#d04f9b"},
+{name:"Universal Horror Unleashed",lat:36.1316,lon:-115.1850,days:["Friday 9/4"],color:"#d04f9b"},
+{name:"Fremont Street Experience",lat:36.1707,lon:-115.1440,days:["Saturday 9/5"],color:"#f08a24"},
+{name:"Nacho Daddy Downtown",lat:36.1700,lon:-115.1430,days:["Saturday 9/5"],color:"#f08a24"}
+];
+
+const days={
+"Thursday 8/27":{
+theme:"Arrival + Griffith",color:"#2f6bff",pace:"Easy",
+stops:["LAX","Budget Rental Car - LAX","Embassy Suites Glendale","Griffith Observatory"],
+schedule:[
+["1:45 PM","Arrive at LAX. Collect bags, then pick up the Budget rental car.","All four"],
+["2:30–3:30 PM","LAX terminals → Budget rental facility. 🚗 Allow about 15–25 min for the shuttle/transfer plus 30–45 min for rental paperwork and vehicle pickup.","All four"],
+["3:30–5:15 PM","Budget LAX → Embassy Suites Glendale. 🚗 Estimated drive: 45–75 min in Thursday afternoon traffic. Add 10–15 min for hotel arrival/parking.","All four"],
+["6:15 PM","Embassy Suites Glendale → Griffith Observatory. 🚗 Estimated drive: 20–30 min; add 10–20 min to park/shuttle depending on availability.","All four"],
+["8:20 PM","Griffith → dinner in Los Feliz/Glendale. 🚗 Estimated drive: 10–20 min, depending on restaurant choice.","All four"]
+],
+sidebar:{Reservations:"Budget rental car pickup at LAX.",Transport:"Rental car day. California drive times include a traffic range plus parking/loading buffer.",Comfort:"Minimal walking if parked close to the Observatory.",Notes:"Santa Monica Pier dinner remains a flexible add-on for an open evening if desired."}
+},
+"Friday 8/28":{
+theme:"Getty + Fran + Dinner with Mark",color:"#26a269",pace:"Easy–Moderate",
+stops:["Embassy Suites Glendale","Aspens Place Recording","Getty Center","Fran's House","Embassy Suites Glendale"],
+schedule:[
+["7:30–8:30 AM","Breakfast at hotel.","All four"],
+["9:00 AM","Embassy Suites Glendale → Aspen drop-off. 🚗 Estimated drive: 25–40 min in weekday morning traffic; leave margin for drop-off.","All four"],
+["After drop-off","Aspen → Getty Center. 🚗 Estimated drive: 30–45 min; add 10–15 min for Getty parking + tram.","Scott / Michelle / Marsha"],
+["11:30 AM–3:00 PM","Getty Center: tram, galleries, gardens and lunch.","Scott / Michelle / Marsha"],
+["3:00 PM","Getty Center → Fran. 🚗 Estimated drive: 15–30 min, depending on westside traffic; add a few minutes for residential parking.","Scott / Michelle / Marsha"],
+["3:30–5:45 PM","Visit Fran.","Scott / Michelle / Marsha"],
+["5:45–7:00 PM","Fran → Aspen / Rina pickup area. 🚗 Estimated drive: 30–50 min in Friday evening traffic. This is one of the day’s most traffic-sensitive legs.","Scott / Michelle / Marsha"],
+["Around 7:00 PM","Pick up Rina when her day finishes, then head toward the dinner area. 🚗 Estimated drive: 25–45 min depending on where Mark’s restaurant ends up.","All four"],
+["7:45–8:00 PM target","Dinner with Mark. Restaurant/location is TBD — choose it based on the pickup route and ease of getting back to Glendale.","All four + Mark"],
+["By 10:15 PM","Leave dinner. 🚗 Allow 20–35 min back to Embassy Suites Glendale at this hour.","All four"],
+["Before 11:00 PM","Hard deadline: back at Embassy Suites Glendale.","All four"]
+],
+sidebar:{Reservations:"Dinner with Mark: location TBD. Getty timed entry / parking if required.",Transport:"Rental car. Friday evening estimates are intentionally conservative.",Comfort:"Getty tram and indoor galleries make the daytime manageable. Friday dinner should be convenient, not another cross-LA excursion.",Notes:"Hard constraint: return to the hotel before 11:00 PM."}
+},
+"Saturday 8/29":{
+theme:"Michael's Birthday + Forest Lawn",color:"#8b5cf6",pace:"Easy",
+stops:["Embassy Suites Glendale","Forest Lawn","Aspens Place Recording","Old Pasadena","Embassy Suites Glendale"],
+schedule:[
+["7:00–8:00 AM","Breakfast. Optional flowers/card.","All four"],
+["8:00 AM","Hotel → Forest Lawn Glendale. 🚗 Estimated drive: 10–15 min; add 5–10 min for entrance/parking.","Scott + Rina"],
+["8:15–10:00 AM","Forest Lawn visit with Rina; unhurried and respectful.","Scott + Rina"],
+["10:00 AM","Forest Lawn → Aspen. 🚗 Estimated drive: 20–30 min Saturday morning.","Scott + Rina"],
+["10:45 AM","Continue with the existing Aspen/conference plan.","Rina"],
+["11:00 AM","Aspen → Pasadena / Americana / hotel options. 🚗 Estimated drive: 20–35 min depending on destination.","Others"],
+["11:30 AM–5:30 PM","Low-key Pasadena, Americana at Brand, Descanso Gardens or hotel rest.","Others"],
+["Evening","Return to Glendale. 🚗 Most local legs should be 15–30 min, but leave extra time if adding Santa Monica.","All four"]
+],
+sidebar:{Reservations:"None for Forest Lawn.",Transport:"Rental car.",Comfort:"Keep the reflective part of the day unhurried.",Notes:"Santa Monica Pier dinner can be used here only if everyone has enough energy after the day."}
+},
+"Sunday 8/30":{
+theme:"Universal Studio Tour",color:"#e66100",pace:"Moderate",
+stops:["Embassy Suites Glendale","Aspens Place Recording","Universal Studios Hollywood","Embassy Suites Glendale"],
+schedule:[
+["7:30–8:30 AM","Breakfast.","All four"],
+["9:00 AM","Hotel → Aspen drop-off. 🚗 Estimated drive: 25–35 min Sunday morning.","All four"],
+["After drop-off","Aspen → Universal Studios Hollywood. 🚗 Estimated drive: 15–25 min; add 15–20 min for garage parking and walking to the gates.","Scott / Michelle / Marsha"],
+["11:15 AM–3:30 PM","Universal Studios Hollywood: prioritize the Studio Tour; add a show if energy allows.","Scott / Michelle / Marsha"],
+["3:30 PM","Universal → hotel. 🚗 Estimated drive: 20–30 min Sunday afternoon.","Scott / Michelle / Marsha"],
+["Around 6:15 PM","Hotel → Aspen pickup area. 🚗 Estimated drive: 20–35 min.","Scott / Michelle / Marsha"],
+["Around 7:00 PM","Pick up Rina; dinner close by. 🚗 Keep the post-pickup leg short — ideally 10–20 min.","All four"]
+],
+sidebar:{Reservations:"Universal tickets in advance.",Transport:"Rental car.",Comfort:"Studio Tour is tram-based; the park itself involves more walking.",Notes:"Do not overpack this day."}
+},
+"Monday 8/31":{
+theme:"GRAMMY Museum + Full Michael Jackson Hollywood Route",color:"#0086c9",pace:"Full / flexible",
+stops:["Embassy Suites Glendale","GRAMMY Museum","Palace Theatre","Monte Carlo Cafe","Stranger in Moscow street","Thriller House — 1345 Carroll Ave","1038 Venice Blvd. — The Graff Lab / Michael Jackson murals","Thriller Dance Break","Michael Jackson Off The Wall Album cover location","Michael Jackson star","TCL Chinese Theatre - MJ Handprints","The Basement Escape Room","Horror Escapes LA","Embassy Suites Glendale"],
+schedule:[
+["9:30 AM","Embassy Suites Glendale → L.A. LIVE / GRAMMY Museum. 🚗 Estimated drive: 25–40 min Monday morning. Add 10–15 min to enter and park at L.A. LIVE.","All four / interested group"],
+["10:30–11:00 AM","PARK ONCE — settle into the L.A. LIVE garage before the museum opens.","Group"],
+["11:00 AM–1:00 PM","GRAMMY Museum. Monday is the correct museum day; Tuesday is closed.","Group"],
+["1:00–1:30 PM","Lunch/snack near L.A. LIVE, then retrieve the rental car.","Group"],
+["1:30 PM","GRAMMY Museum → Palace Theatre. 🚗 Estimated drive: 5–10 min; allow another 5–10 min for a quick legal stop/curb access.","Rina + interested group"],
+["1:50 PM","Palace Theatre → Monte Carlo Cafe. 🚗 Estimated drive: 5–10 min; quick photo stop.","Rina + interested group"],
+["2:10 PM","Monte Carlo Cafe → Stranger in Moscow street. 🚗 Estimated drive: 5–10 min; quick photo stop.","Rina + interested group"],
+["2:30 PM","Stranger in Moscow → Thriller House, 1345 Carroll Ave. 🚗 Estimated drive: 10–15 min. Exterior/sidewalk photo stop only; private residence.","Rina + interested group"],
+["2:50 PM","Thriller House → 1038 Venice Blvd. / The Graff Lab Michael Jackson murals. 🚗 Estimated drive: 10–15 min; allow 10–15 min for parking/curb access and photos.","Rina + interested group"],
+["3:20 PM","1038 Venice → Thriller zombie-dance location, 3677 Union Pacific Ave. 🚗 Estimated drive: 15–25 min. This is the optional outlier if traffic gets ugly.","Rina + interested group"],
+["3:55 PM","Thriller dance location → Off The Wall album-cover location. 🚗 Estimated drive: 25–35 min in mid-afternoon traffic.","Rina + interested group"],
+["4:30 PM","Off The Wall location → Ovation Hollywood garage. 🚗 Estimated drive: 10–20 min; add 10–15 min to enter/park.","Rina + interested group"],
+["4:50–5:45 PM","PARK ONCE — Michael Jackson Hollywood Walk of Fame star + TCL Chinese Theatre MJ handprints. These are the compact walkable Hollywood stops.","Rina + interested group"],
+["After 5:45 PM","OPTIONAL HORROR — THE BASEMENT is preferred if a bookable time fits. Ovation Hollywood → The Basement in Sylmar: 🚗 roughly 30–45 min in early evening traffic. Horror Escapes LA is the downtown backup. Do not cut core MJ stops to force either room in.","Scott + Rina / interested guests"],
+["End of day","Return to Embassy Suites Glendale. 🚗 From Hollywood: about 20–30 min. From Sylmar after The Basement: about 25–35 min.","Group"],
+["Flex only","Fisherman's Village / Marina del Rey remains preserved from the original itinerary as an optional add-on, but it is lower priority than the GRAMMY Museum, the core MJ locations and a sane end-of-day schedule.","Group"]
+],
+sidebar:{Reservations:"GRAMMY Museum is the anchor. Horror room only after a workable game time is confirmed.",Transport:"TODAY'S NAV: use the Google Maps leg buttons below. Every driving stop is included individually so Google Maps cannot silently drop waypoints. Park once at L.A. LIVE, then park once again at Ovation Hollywood for the MJ Star + TCL Chinese Theatre.",Comfort:"Avoid turning 'park once' into a long Hollywood walk. Keep the Hollywood cluster compact.",Notes:"Thriller House at 1345 Carroll Ave is now a protected Michael stop. The Thriller zombie-dance street is a separate optional outlier."}
+},
+"Tuesday 9/1":{
+theme:"Neverland + Santa Barbara Coast Day",color:"#d1242f",pace:"Long drive / scenic",
+stops:["Embassy Suites Glendale","Neverland Valley Ranch Gates","Santa Barbara","Stearns Wharf","Embassy Suites Glendale"],
+schedule:[
+["7:00 AM","Breakfast; pack water and snacks.","All four"],
+["7:45 AM","Glendale → Neverland Valley Ranch gates. 🚗 Estimated drive: 2 hr 20 min–2 hr 50 min. This assumes a Tuesday morning departure before the worst LA congestion; include one comfort stop if needed.","All four"],
+["10:15–10:45 AM target","Neverland Valley Ranch gates. Roadside/photo stop only; respect private property.","All four"],
+["11:00 AM","Neverland → Santa Barbara. 🚗 Estimated drive: 55–75 min through the Santa Ynez / 154 corridor; allow extra time for slower scenic sections.","All four"],
+["12:15–12:45 PM","Arrive Santa Barbara / waterfront. Add 10–15 min to find parking near State Street or the waterfront.","All four"],
+["12:45–6:00 PM","Santa Barbara: State Street / waterfront / Stearns Wharf. Keep walking optional and use the car for repositioning.","All four"],
+["Around sunset","Early dinner or sunset by the water.","All four"],
+["7:00–7:30 PM","Santa Barbara → Embassy Suites Glendale via US-101. 🚗 Estimated drive: 1 hr 45 min–2 hr 20 min, depending on Ventura/LA evening traffic.","All four"],
+["8:45–9:45 PM","Estimated hotel return window. Pack for Vegas before bed.","All four"]
+],
+sidebar:{Reservations:"None required for Neverland gates. Dinner reservation in Santa Barbara optional.",Transport:"Rental car; this intentionally combines Neverland and Santa Barbara into one north-coast day.",Comfort:"Long car day. Keep Santa Barbara stops compact.",Notes:"Driving estimates include realistic traffic ranges, not just free-flow map times."}
+},
+"Wednesday 9/2":{
+theme:"Fly to Las Vegas + Bellagio + Carmine's + High Roller",color:"#8a5cf6",pace:"Easy–Moderate",
+stops:["Embassy Suites Glendale","Budget Rental Car - LAX","LAX","Harry Reid International Airport","The Venetian Resort","Bellagio Conservatory","Carmine's - Forum Shops","High Roller"],
+schedule:[
+["6:45–7:00 AM","Check out in Glendale. Embassy Suites → Budget LAX. 🚗 Estimated drive: 45–70 min in Wednesday morning traffic. Leave extra time because this is a flight day.","All four"],
+["8:00 AM target","Return Budget rental car. Allow 20–30 min for return + shuttle/transfer to the terminal.","All four"],
+["By 9:00 AM","Aim to be inside LAX with luggage checked/security underway.","All four"],
+["11:05 AM–12:20 PM","United UA1809 — LAX to Las Vegas (LAS).","All four • booked"],
+["After landing","Rideshare/taxi from LAS to The Venetian; check in and decompress.","All four"],
+["5:00 PM","Rideshare/taxi to Bellagio Conservatory. Summer display is scheduled through Sept. 12.","All four"],
+["6:15 PM","Dinner at Carmine's in the Forum Shops at Caesars Palace.","All four"],
+["7:45–8:00 PM","Head to the High Roller at The LINQ. Allow queue/security time.","All four"],
+["Evening","High Roller night ride. Tickets are already held and valid for the stated 72-hour window.","All four • booked"]
+],
+sidebar:{Reservations:"UA1809; Venetian; High Roller tickets. Reserve Carmine's dinner.",Transport:"California leg uses the rental car to Budget LAX, then airport shuttle. In Vegas, favor rideshare/taxi to minimize Marsha's walking.",Comfort:"Build seated breaks at Bellagio and dinner before High Roller.",Notes:"Carmine's is at Caesars, not Bellagio."}
+},
+"Thursday 9/3":{
+theme:"Mandalay Bay Day + Border Grill + Michael Jackson ONE",color:"#00a5a8",pace:"Easy",
+stops:["The Venetian Resort","Shark Reef Aquarium","Border Grill Mandalay Bay","Michael Jackson ONE","The Venetian Resort"],
+schedule:[
+["Late morning","Slow start / breakfast at The Venetian.","All four"],
+["1:30 PM","Rideshare/taxi to Mandalay Bay.","All four"],
+["2:00–4:30 PM","Shark Reef Aquarium. Keep this comfortably paced for the whole group.","All four"],
+["4:30–6:30 PM","Stay at Mandalay Bay: rest, browse, and deliberately allow time for the Michael Jackson ONE store before dinner.","All four"],
+["7:00 PM","Border Grill at Mandalay Bay — confirmed dinner reservation.","All four • booked"],
+["8:15 PM","Finish dinner and head toward the MJ ONE theater. Use this time for a bathroom stop / settling in rather than depending on post-dinner shopping.","All four"],
+["9:00–10:30 PM","Michael Jackson ONE by Cirque du Soleil.","All four • booked"],
+["After show","Rideshare/taxi back to The Venetian.","All four"]
+],
+sidebar:{Reservations:"7:00 PM Border Grill at Mandalay Bay; 9:00 PM Michael Jackson ONE for all four. Shark Reef locked into the plan.",Transport:"One rideshare each way; keep the whole afternoon/evening at Mandalay Bay.",Comfort:"Excellent low-transfer day. Build seated/rest time before dinner.",Notes:"MJ ONE shopping is intentionally scheduled before the 7:00 PM dinner reservation so it is not squeezed by the 9:00 PM show."}
+},
+"Friday 9/4":{
+theme:"Split Day: Diana + Sphere / Omega Mart + Horror Unleashed",color:"#d04f9b",pace:"Moderate",
+stops:["The Venetian Resort","Princess Diana Exhibition","Sphere","Omega Mart / AREA15","Universal Horror Unleashed","The Venetian Resort"],
+schedule:[
+["10:00 AM","Split into two pairs.","Split"],
+["10:30 AM–12:00 PM","Princess Diana & The Royals exhibition at The Shops at Crystals.","Michelle + Marsha"],
+["12:00–1:15 PM","Rideshare/taxi back toward The Venetian/Sphere area; lunch/snack. Use the air-conditioned Venetian/Sphere connector where available/open.","Michelle + Marsha"],
+["1:15 PM","Be at Sphere when doors open for the 2:00 PM show.","Michelle + Marsha"],
+["2:00–3:15 PM","The Wizard of Oz at Sphere.","Michelle + Marsha • booked"],
+["10:00 AM–1:00 PM","OPTIONAL: Omega Mart / AREA15. Morning-friendly choice; exact timed ticket availability should be checked before purchase.","Scott + Rina"],
+["1:00–3:30 PM","Lunch / hotel break / recharge.","Scott + Rina"],
+["4:30–5:00 PM","Head to Universal Horror Unleashed. 2026 posted hours are Thu–Sun, 4:00–10:30 PM.","Scott + Rina"],
+["5:00–9:30 PM","Universal Horror Unleashed. Two unlimited-access general admission tickets for Sept. 4.","Scott + Rina • booked"],
+["Evening","Michelle + Marsha: open evening after Sphere; keep flexible.","Michelle + Marsha"]
+],
+sidebar:{Reservations:"Diana/Sphere for Michelle + Marsha; Universal Horror Unleashed for Scott + Rina. Omega Mart optional.",Transport:"Rideshare/taxi for the split groups. Avoid long Strip walks. Use indoor Sphere connector when practical.",Comfort:"Diana closes early; Sphere doors open 45 minutes before showtime and late seating is not permitted.",Notes:"Zak Bagans Haunted Museum intentionally removed — Rina has already done it and does not want to return."}
+},
+"Saturday 9/5":{
+theme:"Open Day + Fremont Street + Nacho Daddy",color:"#f08a24",pace:"Easy",
+stops:["The Venetian Resort","Fremont Street Experience","Nacho Daddy Downtown","The Venetian Resort"],
+schedule:[
+["Morning–afternoon","Open / recovery time. Pool, shopping, Venetian canals or another low-pressure choice.","All four"],
+["5:00 PM","Rideshare/taxi downtown.","All four"],
+["5:30–7:00 PM","Dinner at Nacho Daddy Downtown.","All four"],
+["7:00–9:30 PM","Fremont Street Experience after dark; keep walking limited and use strategic drop-off/pick-up points.","All four"],
+["Afterward","Rideshare/taxi back to The Venetian.","All four"]
+],
+sidebar:{Reservations:"Nacho Daddy reservation optional but useful for the group.",Transport:"Rideshare/taxi both ways. Do not plan to walk from the Strip to Fremont.",Comfort:"Choose a central drop-off and use Fremont as one contained walking zone.",Notes:"Downtown Nacho Daddy is open late on Saturdays, so dinner timing is flexible."}
+}
+};
+
+const summaries={
+"Thursday 8/27":"LAX, Budget rental, Glendale, Griffith",
+"Friday 8/28":"Getty, Fran, Rina pickup, dinner with Mark",
+"Saturday 8/29":"Forest Lawn on Michael's birthday",
+"Sunday 8/30":"Universal Studio Tour",
+"Monday 8/31":"GRAMMY + full Michael Hollywood route + optional horror",
+"Tuesday 9/1":"Neverland + Santa Barbara coast day",
+"Wednesday 9/2":"UA1809 to Vegas, Bellagio, Carmine's, High Roller",
+"Thursday 9/3":"Shark Reef + Border Grill 7 PM + MJ ONE",
+"Friday 9/4":"Diana/Sphere + Omega Mart/Horror Unleashed",
+"Saturday 9/5":"Fremont Street + Nacho Daddy"
+};
+
+const routeLinks={
+"Thursday 8/27":"https://www.google.com/maps/dir/?api=1&origin=LAX&destination=Griffith+Observatory&travelmode=driving&waypoints=Embassy+Suites+Glendale",
+"Friday 8/28":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Getty+Center+Los+Angeles|Santa+Monica+CA",
+"Saturday 8/29":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Forest+Lawn+Glendale|Old+Pasadena",
+"Sunday 8/30":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Universal+Studios+Hollywood",
+"Monday 8/31":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+by+Hilton+Los+Angeles+Glendale&destination=Ovation+Hollywood+6801+Hollywood+Blvd+Los+Angeles&travelmode=driving&waypoints=GRAMMY+Museum+Los+Angeles|Palace+Theatre+630+S+Broadway+Los+Angeles|Monte+Carlo+Cafe+Los+Angeles|4th+St+and+Main+St+Los+Angeles|1345+Carroll+Ave+Los+Angeles+CA+90026|1038+Venice+Blvd+Los+Angeles|3677+Union+Pacific+Ave+Los+Angeles+CA+90023|7771+Beverly+Blvd+Los+Angeles",
+"Tuesday 9/1":"https://www.google.com/maps/dir/?api=1&origin=Embassy+Suites+Glendale&destination=Embassy+Suites+Glendale&travelmode=driving&waypoints=Neverland+Valley+Ranch+Los+Olivos|Stearns+Wharf+Santa+Barbara",
+"Wednesday 9/2":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=High+Roller+Las+Vegas&travelmode=driving&waypoints=Bellagio+Conservatory|Carmine%27s+Las+Vegas",
+"Thursday 9/3":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=The+Venetian+Resort+Las+Vegas&travelmode=driving&waypoints=Shark+Reef+Aquarium+Mandalay+Bay",
+"Friday 9/4":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=Universal+Horror+Unleashed+Las+Vegas&travelmode=driving&waypoints=Sphere+Las+Vegas|AREA15+Las+Vegas",
+"Saturday 9/5":"https://www.google.com/maps/dir/?api=1&origin=The+Venetian+Resort+Las+Vegas&destination=The+Venetian+Resort+Las+Vegas&travelmode=driving&waypoints=Nacho+Daddy+Downtown+Las+Vegas|Fremont+Street+Experience"
+};
+
+
+const mondayNavLegs=[
+["Hotel → GRAMMY Museum","Embassy Suites by Hilton Los Angeles Glendale","GRAMMY Museum Los Angeles"],
+["GRAMMY → Palace Theatre","GRAMMY Museum Los Angeles","Palace Theatre 630 S Broadway Los Angeles CA"],
+["Palace Theatre → Monte Carlo Cafe","Palace Theatre 630 S Broadway Los Angeles CA","Monte Carlo Cafe Los Angeles CA"],
+["Monte Carlo → Stranger in Moscow","Monte Carlo Cafe Los Angeles CA","4th St and Main St Los Angeles CA"],
+["Stranger in Moscow → Thriller House","4th St and Main St Los Angeles CA","1345 Carroll Ave Los Angeles CA 90026"],
+["Thriller House → 1038 Venice mural","1345 Carroll Ave Los Angeles CA 90026","1038 Venice Blvd Los Angeles CA"],
+["1038 Venice → Thriller dance street","1038 Venice Blvd Los Angeles CA","3677 Union Pacific Ave Los Angeles CA 90023"],
+["Thriller dance → Off The Wall","3677 Union Pacific Ave Los Angeles CA 90023","7771 Beverly Blvd Los Angeles CA"],
+["Off The Wall → Ovation Hollywood parking","7771 Beverly Blvd Los Angeles CA","Ovation Hollywood 6801 Hollywood Blvd Los Angeles CA"],
+["Ovation Hollywood → The Basement (optional)","Ovation Hollywood 6801 Hollywood Blvd Los Angeles CA","The Basement Escape Room 12909 Foothill Blvd Sylmar CA"],
+["Ovation Hollywood → Hotel (skip horror)","Ovation Hollywood 6801 Hollywood Blvd Los Angeles CA","Embassy Suites by Hilton Los Angeles Glendale"],
+["The Basement → Hotel (after horror)","The Basement Escape Room 12909 Foothill Blvd Sylmar CA","Embassy Suites by Hilton Los Angeles Glendale"]
+];
+function gmapsLeg(origin,destination){
+ return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(origin)+"&destination="+encodeURIComponent(destination)+"&travelmode=driving";
+}
+
+const sourceNotes={
+"Monday 8/31":[
+["GRAMMY Museum hours","https://grammymuseum.org/visit/"],
+["The Basement LA","https://basementescaperoom.com/los-angeles/"],
+["Horror Escapes LA","https://www.horrorescapesla.com/location-contact"]
+],
+"Wednesday 9/2":[
+["High Roller","https://www.caesars.com/linq/things-to-do/attractions/high-roller"],
+["Bellagio Conservatory","https://bellagio.mgmresorts.com/en/entertainment/conservatory-botanical-garden.html"],
+["Carmine's Las Vegas","https://www.carminesnyc.com/locations/las-vegas"]
+],
+"Thursday 9/3":[
+["Shark Reef","https://mandalaybay.mgmresorts.com/en/entertainment/shark-reef-aquarium.html"],
+["Michael Jackson ONE","https://mandalaybay.mgmresorts.com/en/entertainment/michael-jackson-one.html"]
+],
+"Friday 9/4":[
+["Princess Diana exhibition","https://www.houseoflive.com/diana-las-vegas/tickets"],
+["The Wizard of Oz at Sphere","https://www.thesphere.com/shows/wizard-of-oz-experience"],
+["Omega Mart","https://meowwolf.com/visit/las-vegas"],
+["Universal Horror Unleashed","https://www.universalhorrorunleashed.com/en/us/plan-your-visit"]
+],
+"Saturday 9/5":[
+["Nacho Daddy Downtown","https://nachodaddy.com/downtown"]
+]
+};
+
+const dayOrder=Object.keys(days);
+const pointByName=Object.fromEntries(points.map(p=>[p.name,p]));
+let map, markers=[], lines=[];
+
+function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function initTabs(){
+ const tabs=document.getElementById('tabs'); tabs.innerHTML='';
+ const makeBtn=(label,day,color)=>{const b=document.createElement('button');b.type='button';b.dataset.day=day;b.textContent=label;b.style.background=color;b.addEventListener('click',()=>selectDay(day));tabs.appendChild(b);};
+ makeBtn('Overview','all','#17324b');
+ dayOrder.forEach(d=>makeBtn(d.replace(/\s\d+\/\d+$/,''),d,days[d].color));
+}
+function markerIcon(color,label=null){
+ const txt=label===null?'':String(label);
+ const size=label===null?18:26;
+ const font=label===null?0:12;
+ return L.divIcon({
+   className:'',
+   html:`<div style="background:${color};width:${size}px;height:${size}px;border-radius:50%;border:3px solid white;box-shadow:0 2px 7px #333;color:white;font-weight:900;font-size:${font}px;display:flex;align-items:center;justify-content:center;line-height:1">${txt}</div>`,
+   iconSize:[size,size],
+   iconAnchor:[size/2,size/2]
+ });
+}
+function draw(day){
+ if(!map) return;
+ markers.forEach(m=>map.removeLayer(m)); lines.forEach(l=>map.removeLayer(l)); markers=[]; lines=[];
+ let bounds=[];
+ if(day==='all'){
+   points.forEach(p=>{
+     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p.color)}).addTo(map)
+       .bindPopup(`<b>${esc(p.name)}</b><br>${p.days.map(esc).join('<br>')||'Reference'}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}">Open in Google Maps</a>`);
+     markers.push(m); bounds.push([p.lat,p.lon]);
+   });
+ } else {
+   const orderedStops=days[day].stops.map(n=>pointByName[n]).filter(Boolean);
+   orderedStops.forEach((p,i)=>{
+     const m=L.marker([p.lat,p.lon],{icon:markerIcon(days[day].color,i+1)}).addTo(map)
+       .bindPopup(`<b>${i+1}. ${esc(p.name)}</b><br>${esc(day)}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}">Open in Google Maps</a>`);
+     markers.push(m); bounds.push([p.lat,p.lon]);
+   });
+   const pts=orderedStops.map(p=>[p.lat,p.lon]);
+   if(pts.length>1) lines.push(L.polyline(pts,{color:days[day].color,weight:4,opacity:.75,dashArray:'7,8'}).addTo(map));
+ }
+ if(bounds.length) map.fitBounds(bounds,{padding:[35,35]}); setTimeout(()=>map.invalidateSize(),80);
+}
+function overviewHtml(){
+ return `<div class="day-head"><span class="dot" style="background:#17324b"></span><h2>Overview</h2><span class="badge booked">Updated plan</span></div>
+ <p>The trip now runs from Los Angeles into Las Vegas. The dates below are the corrected anchors.</p>
+ <div class="overview-grid">${dayOrder.map(d=>`<div class="card overview-day" onclick="selectDay('${d}')"><b>${d} — ${esc(days[d].theme)}</b><span>${esc(summaries[d])} • Pace: ${esc(days[d].pace)}</span></div>`).join('')}</div>
+ <div class="card rules"><b>Locked corrections & priorities</b><ul>
+ <li><b>Fri Aug 28:</b> Dinner with Mark after Rina pickup, target 7:45–8:00 PM; location TBD; <b>back at the hotel before 11 PM</b>.</li><li><b>Mon Aug 31:</b> GRAMMY Museum + the <b>full original Michael Hollywood route</b>. Horror escape remains optional, with <b>The Basement favored</b>.</li>
+ <li><b>Tue Sep 1:</b> Neverland gates + Santa Barbara coastal day.</li>
+ <li><b>Wed Sep 2:</b> United UA1809 LAX 11:05 AM → LAS 12:20 PM; Venetian; Bellagio; Carmine's; High Roller.</li>
+ <li><b>Thu Sep 3:</b> Shark Reef Aquarium + <b>Border Grill reservation at 7 PM</b> + Michael Jackson ONE at 9 PM.</li>
+ <li><b>Fri Sep 4:</b> Michelle/Marsha — Diana + 2 PM Sphere. Scott/Rina — optional Omega Mart + Universal Horror Unleashed.</li>
+ <li><b>Sat Sep 5:</b> Fremont Street + Nacho Daddy.</li>
+ <li>California itinerary now includes estimated drive-time ranges and parking/loading buffers for each major leg.</li><li>Vegas transportation should favor rideshare/taxi and clustered activities to minimize Marsha's walking.</li>
+ <li>Zak Bagans Haunted Museum is removed.</li>
+ </ul></div>
+ <div class="card"><b>Merge audit</b><p>The pre-upload GitHub commit was used as the baseline. The original Michael locations are preserved and now appear explicitly in Monday’s schedule, with parking/transport strategy shown.</p></div><div class="card"><b>California drive-time estimates</b><p>Times are planning ranges based on the scheduled day/time and normal LA/SoCal congestion patterns. Recheck live traffic on the day of travel, especially Friday evening and the Wednesday LAX run.</p></div><div class="card"><b>Still flexible</b><p>Santa Monica Pier dinner remains an optional LA evening. Final dinner time/place with Mark and exact horror-escape game time still need booking.</p></div>`;
+}
+function sourcesHtml(day){
+ const items=sourceNotes[day]||[]; if(!items.length) return '';
+ return `<div class="card"><div class="label">Planning links</div>${items.map(([n,u])=>`<a class="btn" target="_blank" rel="noopener" href="${u}">${esc(n)}</a>`).join('')}</div>`;
+}
+function dayHtml(day){
+ const d=days[day];
+ const events=d.schedule.map(e=>`<div class="event"><div class="time">${esc(e[0])}</div><div>${esc(e[1])}</div>${e[2]?`<div class="who">${esc(e[2])}</div>`:''}</div>`).join('');
+ const sidebar=Object.entries(d.sidebar).map(([k,v])=>`<div class="info"><div class="label">${esc(k)}</div><div>${esc(v)}</div></div>`).join('');
+ let protectedStops='';
+ if(day==='Monday 8/31'){
+   protectedStops=`<div class="card"><b>Restored from the original itinerary — do not drop these</b>
+   <div class="split"><div><div class="label">Downtown / Westlake MJ cluster</div><ul>
+   <li>Palace Theatre</li><li>Monte Carlo Cafe</li><li>Stranger in Moscow street</li><li><b>Thriller House — 1345 Carroll Ave</b></li><li>1038 Venice Blvd. — The Graff Lab / Michael Jackson murals</li><li>Thriller Dance Break — 3677 Union Pacific Ave (optional outlier)</li>
+   </ul></div><div><div class="label">Hollywood MJ cluster</div><ul>
+   <li>Off The Wall album-cover location</li><li>Michael Jackson Star</li><li>TCL Chinese Theatre — MJ handprints</li>
+   </ul></div></div>
+   <p class="small">Fisherman's Village / Marina del Rey is also preserved as a flex stop. If the day is too full, remove the optional horror room or marina before removing the core Michael locations.</p></div>`;
+ }
+ return `<div class="day-head"><span class="dot" style="background:${d.color}"></span><h2>${day} — ${esc(d.theme)}</h2><span class="badge">Pace: ${esc(d.pace)}</span></div>
+ <div class="timeline">${events}</div>
+ ${day==='Monday 8/31'
+ ? `<div class="card"><b>Google Maps navigation — every driving stop</b><p class="small">Tap these in order as you drive. Individual legs avoid Google Maps mobile waypoint limits.</p>
+    <a class="btn" target="_blank" rel="noopener" href="${routeLinks[day]}">Open combined Monday route</a>
+    <div style="margin-top:8px">${mondayNavLegs.map((x,i)=>`<a class="btn" target="_blank" rel="noopener" href="${gmapsLeg(x[1],x[2])}">${i+1}. ${esc(x[0])}</a>`).join('')}</div>
+    <p class="small"><b>At Ovation:</b> park once, then walk to the Michael Jackson Star and TCL Chinese Theatre handprints. Those are intentionally not separate driving legs.</p></div>`
+ : `<a class="btn" target="_blank" rel="noopener" href="${routeLinks[day]}">Open route in Google Maps</a>`}
+ <div class="sidegrid">${sidebar}</div>${protectedStops}${sourcesHtml(day)}`;
+}
+function selectDay(day){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.day===day));document.getElementById('content').innerHTML=day==='all'?overviewHtml():dayHtml(day);draw(day);}
+function initMap(){if(!window.L){document.getElementById('map').innerHTML='<div style="padding:20px">Map library did not load. Route buttons still open Google Maps.</div>';return;}map=L.map('map').setView([35,-117],7);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);}
+initTabs();initMap();selectDay('all');
+</script>
+</body></html>
